@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "11729924621",
+    "project_id": "misgastosapp-58e5c",
+    "storage_bucket": "misgastosapp-58e5c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:11729924621:android:e1c8321c81f1cc78f9db44",
+        "android_client_info": {
+          "package_name": "com.example.misgastos_app_final"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC8UX85t1-5NKqBMq7xm2Jb115PQvyHdRo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
