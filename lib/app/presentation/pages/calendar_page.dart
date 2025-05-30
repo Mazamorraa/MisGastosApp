@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:misgastosapp/app/data/models/expense_model.dart';
+import 'package:misgastosapp/app/data/models/income_model.dart';
 import 'package:misgastosapp/app/presentation/controllers/expense_controller.dart';
+import 'package:misgastosapp/app/presentation/controllers/income_controller.dart';
 import 'package:misgastosapp/app/presentation/widgets/expense_tile.dart';
 import 'package:table_calendar/table_calendar.dart';
 
@@ -15,22 +17,31 @@ class CalendarPage extends StatefulWidget {
 class _CalendarPageState extends State<CalendarPage> {
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
-  Map<DateTime, List<ExpenseModel>> _events = {};
+  Map<DateTime, List<ExpenseModel>> _gastos = {};
+  Map<DateTime, List<IncomeModel>> _ingresos = {};
 
   @override
   void initState() {
     super.initState();
+    final expenseCtrl = Get.find<ExpenseController>();
+    final incomeCtrl = Get.find<IncomeController>();
 
-    final controller = Get.find<ExpenseController>();
     _selectedDay = DateTime.now();
 
-    ever<List<ExpenseModel>>(controller.expenses, (_) {
+    ever<List<ExpenseModel>>(expenseCtrl.expenses, (_) {
       setState(() {
-        _events = _groupExpensesByDate(controller.expenses);
+        _gastos = _groupExpensesByDate(expenseCtrl.expenses);
       });
     });
 
-    _events = _groupExpensesByDate(controller.expenses);
+    ever<List<IncomeModel>>(incomeCtrl.incomes, (_) {
+      setState(() {
+        _ingresos = _groupIncomesByDate(incomeCtrl.incomes);
+      });
+    });
+
+    _gastos = _groupExpensesByDate(expenseCtrl.expenses);
+    _ingresos = _groupIncomesByDate(incomeCtrl.incomes);
   }
 
   DateTime onlyDate(DateTime date) => DateTime(date.year, date.month, date.day);
@@ -39,34 +50,53 @@ class _CalendarPageState extends State<CalendarPage> {
     List<ExpenseModel> allExpenses,
   ) {
     final Map<DateTime, List<ExpenseModel>> data = {};
-    for (var exp in allExpenses) {
-      final date = onlyDate(exp.date);
-      data.putIfAbsent(date, () => []).add(exp);
+    for (var e in allExpenses) {
+      final date = onlyDate(e.fecha);
+      data.putIfAbsent(date, () => []).add(e);
     }
     return data;
   }
 
-  List<ExpenseModel> _getEventsForDay(DateTime day) {
-    return _events[onlyDate(day)] ?? [];
+  Map<DateTime, List<IncomeModel>> _groupIncomesByDate(
+    List<IncomeModel> allIncomes,
+  ) {
+    final Map<DateTime, List<IncomeModel>> data = {};
+    for (var e in allIncomes) {
+      if (e.fechaInicio != null) {
+        final date = onlyDate(e.fechaInicio!);
+        data.putIfAbsent(date, () => []).add(e);
+      }
+    }
+    return data;
   }
+
+  List<ExpenseModel> _getGastosForDay(DateTime day) =>
+      _gastos[onlyDate(day)] ?? [];
+  List<IncomeModel> _getIngresosForDay(DateTime day) =>
+      _ingresos[onlyDate(day)] ?? [];
 
   @override
   Widget build(BuildContext context) {
-    final expensesToday = _getEventsForDay(_selectedDay ?? DateTime.now());
-    final total = expensesToday.fold<double>(
-      0.0,
-      (sum, item) => sum + item.amount,
-    );
+    final selectedDay = _selectedDay ?? DateTime.now();
+    final gastosDelDia = _getGastosForDay(selectedDay);
+    final ingresosDelDia = _getIngresosForDay(selectedDay);
+
+    final totalGastos = gastosDelDia.fold(0.0, (sum, e) => sum + e.monto);
+    final totalIngresos = ingresosDelDia.fold(0.0, (sum, e) => sum + e.monto);
+    final balance = totalIngresos - totalGastos;
 
     return Scaffold(
       body: Column(
         children: [
-          TableCalendar<ExpenseModel>(
+          TableCalendar(
             firstDay: DateTime.utc(2022, 1, 1),
             lastDay: DateTime.utc(2030, 12, 31),
             focusedDay: _focusedDay,
             selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-            eventLoader: _getEventsForDay,
+            eventLoader: (day) => [
+              ..._getGastosForDay(day),
+              ..._getIngresosForDay(day),
+            ],
             onDaySelected: (selected, focused) {
               setState(() {
                 _selectedDay = selected;
@@ -88,24 +118,16 @@ class _CalendarPageState extends State<CalendarPage> {
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            child: Text(
-              'Total del día: \$${total.toStringAsFixed(2)}',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-          ),
           const SizedBox(height: 10),
-
           Expanded(
-            child: expensesToday.isEmpty
+            child: gastosDelDia.isEmpty
                 ? const Center(child: Text('Sin gastos en este día'))
                 : ListView.builder(
-                    itemCount: expensesToday.length,
+                    itemCount: gastosDelDia.length,
                     itemBuilder: (_, index) {
-                      final exp = expensesToday[index];
+                      final exp = gastosDelDia[index];
                       return Dismissible(
-                        key: Key(exp.id),
+                        key: Key(exp.id ?? UniqueKey().toString()),
                         direction: DismissDirection.endToStart,
                         background: Container(
                           color: Colors.red,
@@ -115,8 +137,10 @@ class _CalendarPageState extends State<CalendarPage> {
                         ),
                         onDismissed: (_) {
                           final controller = Get.find<ExpenseController>();
-                          controller.deleteExpense(exp.id);
-                          Get.snackbar('Gasto eliminado', exp.description);
+                          controller.deleteExpense(
+                            exp.id ?? UniqueKey().toString(),
+                          );
+                          Get.snackbar('Gasto eliminado', exp.descripcion);
                         },
                         child: ExpenseTile(expense: exp),
                       );

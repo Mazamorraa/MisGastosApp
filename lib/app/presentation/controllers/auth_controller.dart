@@ -24,10 +24,16 @@ class AuthController extends GetxController {
     }
   }
 
-  Future<void> register(String email, String password) async {
+  Future<void> register(
+    String email,
+    String password,
+    String nombre,
+    int edad,
+    String pais,
+  ) async {
     try {
       isLoading.value = true;
-      user.value = await registerUseCase(email, password);
+      user.value = await registerUseCase(email, password, nombre, edad, pais);
       Get.offAllNamed('/home');
     } catch (e) {
       Get.snackbar('Error', e.toString());

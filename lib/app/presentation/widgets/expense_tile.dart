@@ -9,9 +9,9 @@ class ExpenseTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      title: Text(expense.description),
-      subtitle: Text('${expense.date.toLocal()}'.split(' ')[0]),
-      trailing: Text('\$${expense.amount.toStringAsFixed(2)}'),
+      title: Text(expense.descripcion),
+      subtitle: Text('${expense.fecha.toLocal()}'.split(' ')[0]),
+      trailing: Text('\$${expense.monto.toStringAsFixed(2)}'),
     );
   }
 }

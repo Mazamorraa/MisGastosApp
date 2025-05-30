@@ -7,6 +7,6 @@ class LoginUseCase {
   LoginUseCase(this.repository);
 
   Future<User?> call(String email, String password) {
-    return repository.signInWithEmail(email, password);
+    return repository.login(email, password);
   }
 }

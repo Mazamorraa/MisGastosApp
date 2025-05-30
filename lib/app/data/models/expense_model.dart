@@ -1,30 +1,30 @@
-class ExpenseModel {
-  final String id;
-  final String description;
-  final double amount;
-  final DateTime date;
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:misgastosapp/app/domain/entities/expense.dart';
 
+class ExpenseModel extends Expense {
   ExpenseModel({
-    required this.id,
-    required this.description,
-    required this.amount,
-    required this.date,
-  });
+    String? id,
+    required double monto,
+    required String descripcion,
+    required DateTime fecha,
+  }) : super(id: id, monto: monto, descripcion: descripcion, fecha: fecha);
 
   Map<String, dynamic> toMap() {
     return {
-      'description': description,
-      'amount': amount,
-      'date': date.toIso8601String(),
+      'monto': monto,
+      'descripcion': descripcion,
+      'fecha': Timestamp.fromDate(fecha),
     };
   }
 
-  factory ExpenseModel.fromMap(String id, Map<String, dynamic> map) {
+  factory ExpenseModel.fromMap(Map<String, dynamic> map, String id) {
     return ExpenseModel(
       id: id,
-      description: map['description'],
-      amount: (map['amount'] as num).toDouble(),
-      date: DateTime.parse(map['date']),
+      monto: map['monto'] is int
+          ? (map['monto'] as int).toDouble()
+          : map['monto'],
+      descripcion: map['descripcion'],
+      fecha: (map['fecha'] as Timestamp).toDate(),
     );
   }
 }

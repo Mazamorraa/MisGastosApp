@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:misgastosapp/app/domain/entities/expense.dart';
 import 'package:misgastosapp/app/presentation/controllers/expense_controller.dart';
 
 class AddExpensePage extends StatelessWidget {
@@ -34,7 +35,13 @@ class AddExpensePage extends StatelessWidget {
                 final amt = double.tryParse(amountCtrl.text) ?? 0.0;
 
                 if (desc.isNotEmpty && amt > 0) {
-                  await controller.addExpense(desc, amt);
+                  controller.agregarGasto(
+                    Expense(
+                      monto: double.parse(amountCtrl.text),
+                      descripcion: descriptionCtrl.text,
+                      fecha: DateTime.now(),
+                    ),
+                  );
 
                   Get.snackbar(
                     'Gasto agregado',

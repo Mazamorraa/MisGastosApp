@@ -7,6 +7,9 @@ class RegisterPage extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
   final emailCtrl = TextEditingController();
   final passCtrl = TextEditingController();
+  final nombreCtrl = TextEditingController();
+  final edadCtrl = TextEditingController();
+  final paisCtrl = TextEditingController();
 
   RegisterPage({super.key});
 
@@ -35,9 +38,18 @@ class RegisterPage extends StatelessWidget {
                         formKey: _formKey,
                         emailController: emailCtrl,
                         passwordController: passCtrl,
+                        nombreController: nombreCtrl,
+                        edadController: edadCtrl,
+                        paisController: paisCtrl,
                         onSubmit: () {
                           if (_formKey.currentState!.validate()) {
-                            controller.register(emailCtrl.text, passCtrl.text);
+                            controller.register(
+                              emailCtrl.text,
+                              passCtrl.text,
+                              nombreCtrl.text,
+                              int.parse(edadCtrl.text),
+                              paisCtrl.text,
+                            );
                           }
                         },
                         buttonText: 'Registrarse',

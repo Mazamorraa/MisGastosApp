@@ -1,44 +1,45 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:misgastosapp/app/domain/repositories/auth_repository.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
-  final FirebaseAuth _firebaseAuth;
+  final FirebaseAuth _auth;
+  final FirebaseFirestore _firestore;
 
-  AuthRepositoryImpl(this._firebaseAuth);
+  AuthRepositoryImpl(this._auth, this._firestore);
 
   @override
-  Future<User?> signInWithEmail(String email, String password) async {
-    try {
-      final credential = await _firebaseAuth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-      return credential.user;
-    } on FirebaseAuthException catch (e) {
-      throw Exception(e.message);
-    }
+  Future<User> login(String email, String password) async {
+    final cred = await _auth.signInWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+    return cred.user!;
   }
 
   @override
-  Future<User?> registerWithEmail(String email, String password) async {
-    try {
-      final credential = await _firebaseAuth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-      return credential.user;
-    } on FirebaseAuthException catch (e) {
-      throw Exception(e.message);
-    }
-  }
+  Future<User> register(
+    String email,
+    String password,
+    String nombre,
+    int edad,
+    String pais,
+  ) async {
+    final cred = await _auth.createUserWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+    final uid = cred.user!.uid;
 
-  @override
-  Future<void> signOut() async {
-    await _firebaseAuth.signOut();
-  }
+    await _firestore.collection('usuarios').doc(uid).set({
+      'nombre': nombre,
+      'correo': email,
+      'edad': edad,
+      'pais': pais,
+      'creado': FieldValue.serverTimestamp(),
+    });
+    print('Usuario guardado en Firestore');
 
-  @override
-  Stream<User?> authStateChanges() {
-    return _firebaseAuth.authStateChanges();
+    return cred.user!;
   }
 }
