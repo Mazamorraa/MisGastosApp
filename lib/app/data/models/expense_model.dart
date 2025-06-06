@@ -3,11 +3,11 @@ import 'package:misgastosapp/app/domain/entities/expense.dart';
 
 class ExpenseModel extends Expense {
   ExpenseModel({
-    String? id,
-    required double monto,
-    required String descripcion,
-    required DateTime fecha,
-  }) : super(id: id, monto: monto, descripcion: descripcion, fecha: fecha);
+    super.id,
+    required super.monto,
+    required super.descripcion,
+    required super.fecha,
+  });
 
   Map<String, dynamic> toMap() {
     return {

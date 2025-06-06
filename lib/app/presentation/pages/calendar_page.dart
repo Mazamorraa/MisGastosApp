@@ -62,10 +62,8 @@ class _CalendarPageState extends State<CalendarPage> {
   ) {
     final Map<DateTime, List<IncomeModel>> data = {};
     for (var e in allIncomes) {
-      if (e.fechaInicio != null) {
-        final date = onlyDate(e.fechaInicio!);
-        data.putIfAbsent(date, () => []).add(e);
-      }
+      final date = onlyDate(e.fechaInicio!);
+      data.putIfAbsent(date, () => []).add(e);
     }
     return data;
   }

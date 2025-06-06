@@ -35,10 +35,10 @@ class ExpenseHistoryPage extends StatelessWidget {
         movimientos.sort((a, b) {
           final dateA = a['tipo'] == 'gasto'
               ? (a['obj'] as ExpenseModel).fecha
-              : (a['obj'] as IncomeModel).fechaInicio!;
+              : (a['obj'] as IncomeModel).fechaInicio;
           final dateB = b['tipo'] == 'gasto'
               ? (b['obj'] as ExpenseModel).fecha
-              : (b['obj'] as IncomeModel).fechaInicio!;
+              : (b['obj'] as IncomeModel).fechaInicio;
           return dateB.compareTo(dateA);
         });
 
@@ -143,7 +143,7 @@ class ExpenseHistoryPage extends StatelessWidget {
                   leading: const Icon(Icons.arrow_upward, color: Colors.green),
                   title: Text(ingreso.descripcion),
                   subtitle: Text(
-                    ingreso.fechaInicio!.toLocal().toString().split(' ')[0],
+                    ingreso.fechaInicio.toLocal().toString().split(' ')[0],
                   ),
                   trailing: Text('+\$${ingreso.monto.toStringAsFixed(2)}'),
                 ),

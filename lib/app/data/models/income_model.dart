@@ -3,18 +3,12 @@ import 'package:misgastosapp/app/domain/entities/income.dart';
 
 class IncomeModel extends Income {
   IncomeModel({
-    String? id,
-    required double monto,
-    required String descripcion,
-    required DateTime fechaInicio,
-    required FrecuenciaIngreso frecuencia,
-  }) : super(
-         id: id,
-         monto: monto,
-         descripcion: descripcion,
-         fechaInicio: fechaInicio,
-         frecuencia: frecuencia,
-       );
+    super.id,
+    required super.monto,
+    required super.descripcion,
+    required super.fechaInicio,
+    required super.frecuencia,
+  });
 
   Map<String, dynamic> toMap() {
     return {
